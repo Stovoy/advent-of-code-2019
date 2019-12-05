@@ -73,7 +73,6 @@ def run_program(program, input_value):
             break
         else:
             raise ValueError(opcode)
-    return program[0]
 
 
 line = lines[0]
