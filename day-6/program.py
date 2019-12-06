@@ -20,20 +20,13 @@ def bfs(nodes, start):
         yield node, depth
 
 
-def total_directs_indirects(nodes, start):
-    directs = 0
-    indirects = 0
-    for node, depth in bfs(nodes, start):
-        directs += 1
-        indirects += depth - 1
-    return directs, indirects
+def total_connections(nodes, start):
+    return sum(depth for node, depth in bfs(nodes, start))
 
 
 def distance(nodes, start, end):
-    for node, depth in bfs(nodes, start):
-        if node == end:
-            return depth - 2
+    return next(depth - 2 for node, depth in bfs(nodes, start) if node == end)
 
 
-print(sum(total_directs_indirects(nodes, 'COM')))
+print(total_connections(nodes, 'COM'))
 print(distance(nodes, 'YOU', 'SAN'))
