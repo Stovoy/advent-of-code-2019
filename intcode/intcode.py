@@ -10,6 +10,11 @@ class Flags:
             PARAM_1: False,
             PARAM_2: False,
         }
+        self.is_relative = {
+            PARAM_0: False,
+            PARAM_1: False,
+            PARAM_2: False,
+        }
 
 
 class Opcode:
@@ -83,6 +88,12 @@ class Equal(Opcode):
         runtime.i += 4
 
 
+class AdjustRelativeBase(Opcode):
+    def process(self, runtime):
+        runtime.relative_base += runtime.parse_param(PARAM_0)
+        runtime.i += 2
+
+
 class Exit(Opcode):
     def process(self, runtime):
         runtime.stop()
@@ -97,6 +108,7 @@ Opcodes = {
     6: Zero(),
     7: LessThan(),
     8: Equal(),
+    9: AdjustRelativeBase(),
     99: Exit(),
 }
 
@@ -109,6 +121,7 @@ class Runtime:
         self.output_runtimes = []
         self.input_runtimes = []
         self.outputs = []
+        self.relative_base = 0
         self.flags = Flags()
 
     def add_output_runtime(self, output_runtime):
@@ -125,14 +138,32 @@ class Runtime:
         self.flags.is_positional[PARAM_0] = opcode[2] == "0"
         self.flags.is_positional[PARAM_1] = opcode[1] == "0"
         self.flags.is_positional[PARAM_2] = opcode[0] == "0"
+        self.flags.is_relative[PARAM_0] = opcode[2] == "2"
+        self.flags.is_relative[PARAM_1] = opcode[1] == "2"
+        self.flags.is_relative[PARAM_2] = opcode[0] == "2"
         return Opcodes[int(opcode[3:5])]
 
     def parse_param(self, param):
         i = self.i + param
-        return self.program[self.program[i]] if self.flags.is_positional[param] else self.program[i]
+        if self.flags.is_positional[param]:
+            i = self.program[i]
+        elif self.flags.is_relative[param]:
+            i = self.program[i] + self.relative_base
+        self.ensure_bounds(i)
+        return self.program[i]
 
     def write_param(self, param, value):
-        self.program[self.program[self.i + param]] = value
+        i = self.i + param
+        if self.flags.is_relative[param]:
+            i = self.program[i] + self.relative_base
+        else:
+            i = self.program[i]
+        self.ensure_bounds(i)
+        self.program[i] = value
+
+    def ensure_bounds(self, i):
+        if i >= len(self.program):
+            self.program.extend([0] * (i - len(self.program) + 1))
 
     def output(self, output):
         for output_runtime in self.output_runtimes:
