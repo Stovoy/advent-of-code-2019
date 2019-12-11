@@ -180,4 +180,5 @@ class Runtime:
                 opcode = self.parse_opcode(opcode)
                 opcode.process(self)
         except StopIteration:
-            pass
+            return False
+        return True
