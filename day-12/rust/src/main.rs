@@ -1,8 +1,5 @@
-#[derive(Clone, Eq, PartialEq)]
-struct Moon {
-    position: [i64; 3],
-    velocity: [i64; 3],
-}
+use std::fs;
+use std::cmp::Ordering;
 
 enum Pair<T> {
     Both(T, T),
@@ -13,18 +10,34 @@ enum Pair<T> {
 fn index_twice<T>(slice: &mut [T], a: usize, b: usize) -> Pair<&mut T> {
     if a == b {
         slice.get_mut(a).map_or(Pair::None, Pair::One)
+    } else if a >= slice.len() || b >= slice.len() {
+        Pair::None
     } else {
-        if a >= slice.len() || b >= slice.len() {
-            Pair::None
-        } else {
-            // Safe because a, b are in bounds and distinct
-            unsafe {
-                let a_ref = &mut *(slice.get_unchecked_mut(a) as *mut _);
-                let b_ref = &mut *(slice.get_unchecked_mut(b) as *mut _);
-                Pair::Both(a_ref, b_ref)
-            }
+        // Safe because a, b are in bounds and distinct
+        unsafe {
+            let a_ref = &mut *(slice.get_unchecked_mut(a) as *mut _);
+            let b_ref = &mut *(slice.get_unchecked_mut(b) as *mut _);
+            Pair::Both(a_ref, b_ref)
         }
     }
+}
+
+fn gcd(a: i64, b: i64) -> i64 {
+    let mut nums = (a, b);
+    while nums.1 != 0 {
+        nums = (nums.1, nums.0 % nums.1);
+    }
+    nums.0
+}
+
+fn lcm(a: i64, b: i64) -> i64 {
+    a * b / gcd(a, b)
+}
+
+#[derive(Clone, Eq, PartialEq)]
+struct Moon {
+    position: [i64; 3],
+    velocity: [i64; 3],
 }
 
 fn step_dimension(moons: &mut [Moon], dimension: usize) {
@@ -35,58 +48,47 @@ fn step_dimension(moons: &mut [Moon], dimension: usize) {
         }
     }
     for pairs in combo_indicies.iter() {
-        match index_twice(moons, pairs[0], pairs[1]) {
-            Pair::Both(a, b) => {
-                if a.position[dimension] > b.position[dimension] {
+        if let Pair::Both(a, b) = index_twice(moons, pairs[0], pairs[1]) {
+            match a.position[dimension].cmp(&b.position[dimension]) {
+                Ordering::Greater => {
                     a.velocity[dimension] -= 1;
                     b.velocity[dimension] += 1;
-                } else if a.position[dimension] < b.position[dimension] {
+                },
+                Ordering::Less => {
                     a.velocity[dimension] += 1;
                     b.velocity[dimension] -= 1;
-                }
+                },
+                _ => {}
             }
-            _ => {}
         }
     }
 
     for moon in moons.iter_mut() {
-        moon.position[dimension] += moon.velocity[dimension]
+        moon.position[dimension] += moon.velocity[dimension];
     }
 }
-
-fn gcd(a: i64, b: i64) -> i64 {
-    let mut nums = (a, b);
-    while nums.1 != 0 {
-        nums = (nums.1, nums.0 % nums.1);
-    }
-    return nums.0;
-}
-
-fn lcm(a: i64, b: i64) -> i64 {
-    a * b / gcd(a, b)
-}
-
-use std::fs;
 
 fn main() {
     let mut moons: Vec<Moon> = Vec::new();
 
     let contents = fs::read_to_string("../input.txt").unwrap();
     for line in contents.lines() {
-        let mut position= [0, 0, 0];
-        for (i, part) in line.split(",").enumerate() {
+        let mut position = [0, 0, 0];
+        for (i, part) in line.split(',').enumerate() {
             position[i] = part.replace(">", "")
-                .split("=").nth(1).unwrap()
+                .split('=').nth(1).unwrap()
                 .parse::<i64>().unwrap();
         }
-        moons.push(Moon{
+        moons.push(Moon {
             position,
             velocity: [0, 0, 0],
         });
     }
 
+    let mut periods = [0, 0, 0];
+
     for _ in 0..1000 {
-        for dimension in 0..3 {
+        for dimension in 0..periods.len() {
             step_dimension(&mut moons, dimension);
         }
     }
@@ -102,16 +104,15 @@ fn main() {
                 .map(|v| v.abs())
                 .sum::<i64>()
         });
+
     println!("{}", energy);
 
-    let mut periods = [0, 0, 0];
-
-    for dimension in 0..3 {
+    for (dimension, period) in periods.iter_mut().enumerate() {
         let mut t: i64 = 0;
         let original = moons.clone();
         loop {
             if t > 0 && moons == original {
-                periods[dimension] = t;
+                *period = t;
                 break;
             }
 
