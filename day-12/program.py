@@ -1,3 +1,4 @@
+import math
 from itertools import combinations
 
 with open('input.txt') as input_file:
@@ -51,14 +52,8 @@ for dimension in range(3):
         t += 1
 
 
-def gcd(a, b):
-    while b:
-        a, b = b, a % b
-    return a
-
-
 def lcm(a, b):
-    return (a * b) // gcd(a, b)
+    return (a * b) // math.gcd(a, b)
 
 
 print(lcm(periods[0], lcm(periods[1], periods[2])))
