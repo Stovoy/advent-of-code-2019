@@ -1,7 +1,7 @@
 import math
 from itertools import combinations
 
-with open('input.txt') as input_file:
+with open('../input.txt') as input_file:
     lines = input_file.readlines()
 
 moons = []
