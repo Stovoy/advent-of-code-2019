@@ -124,6 +124,14 @@ class Runtime:
         self.relative_base = 0
         self.flags = Flags()
 
+    def save(self):
+        return self.program[:], self.relative_base, self.i
+
+    def load(self, state):
+        self.program = state[0]
+        self.relative_base = state[1]
+        self.i = state[2]
+
     def add_output_runtime(self, output_runtime):
         self.output_runtimes.append(output_runtime)
 
