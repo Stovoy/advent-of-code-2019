@@ -1,11 +1,8 @@
 import math
-from intcode import Runtime
-from collections import defaultdict, Counter
+from collections import defaultdict
 
 with open('input.txt') as input_file:
     lines = input_file.readlines()
-
-formulas = {}
 
 
 class Formula:
