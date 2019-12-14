@@ -44,13 +44,8 @@ for line in lines:
         in_formulas[i_name].append(formula)
     out_formulas[o_name] = formula
 
-answers = []
 
-needed = defaultdict(lambda: 0)
-producing = defaultdict(lambda: 0)
-
-
-def produce(name):
+def produce(name, needed, producing):
     formula = out_formulas[name]
     out_reagent = formula.output
     count = math.ceil(
@@ -62,11 +57,13 @@ def produce(name):
 
     for in_reagent in formula.inputs:
         if in_reagent.name != start:
-            produce(in_reagent.name)
+            produce(in_reagent.name, needed, producing)
 
 
+needed = defaultdict(lambda: 0)
+producing = defaultdict(lambda: 0)
 needed[end] = 1
-produce(end)
+produce(end, needed, producing)
 print(needed[start])
 
 search = 1000000000000
@@ -78,7 +75,7 @@ while True:
     needed = defaultdict(lambda: 0)
     producing = defaultdict(lambda: 0)
     needed[end] = i
-    produce(end)
+    produce(end, needed, producing)
     if needed[start] > search:
         narrowing = True
         jump = max(1, jump // 2)
