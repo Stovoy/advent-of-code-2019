@@ -13,17 +13,11 @@ class Formula:
         self.inputs = []
         self.output = None
 
-    def __repr__(self):
-        return f'{self.inputs} -> {self.output}'
-
 
 class ReagentInfo:
     def __init__(self, name, number):
         self.name = name
         self.number = number
-
-    def __repr__(self):
-        return f'{self.name}: {self.number}'
 
 
 in_formulas = defaultdict(list)
