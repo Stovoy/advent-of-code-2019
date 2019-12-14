@@ -26,11 +26,11 @@ class ReagentInfo:
         return f'{self.name}: {self.number}'
 
 
-in_formulas = defaultdict(lambda: [])
+in_formulas = defaultdict(list)
 out_formulas = {}
 
-start = 'ORE'
-end = 'FUEL'
+ore = 'ORE'
+fuel = 'FUEL'
 for line in lines:
     l, r = line.split("=>")
     o_num, o_name = r.strip().split(" ")
@@ -44,8 +44,11 @@ for line in lines:
         in_formulas[i_name].append(formula)
     out_formulas[o_name] = formula
 
+needed = defaultdict(int)
+producing = defaultdict(int)
 
-def produce(name, needed, producing):
+
+def produce(name):
     formula = out_formulas[name]
     out_reagent = formula.output
     count = math.ceil(
@@ -56,15 +59,13 @@ def produce(name, needed, producing):
         needed[in_reagent.name] += count * in_reagent.number
 
     for in_reagent in formula.inputs:
-        if in_reagent.name != start:
-            produce(in_reagent.name, needed, producing)
+        if in_reagent.name != ore:
+            produce(in_reagent.name)
 
 
-needed = defaultdict(int)
-producing = defaultdict(int)
-needed[end] = 1
-produce(end, needed, producing)
-print(needed[start])
+needed[fuel] = 1
+produce(fuel)
+print(needed[ore])
 
 search = 1000000000000
 fuel_to_produce = 0
@@ -72,11 +73,11 @@ fuel_jump = 1
 narrowing = False
 
 while True:
-    needed = defaultdict(lambda: 0)
-    producing = defaultdict(lambda: 0)
-    needed[end] = fuel_to_produce
-    produce(end, needed, producing)
-    if needed[start] > search:
+    needed.clear()
+    producing.clear()
+    needed[fuel] = fuel_to_produce
+    produce(fuel)
+    if needed[ore] > search:
         narrowing = True
         fuel_jump = max(1, fuel_jump // 2)
         fuel_to_produce -= fuel_jump
