@@ -60,32 +60,32 @@ def produce(name, needed, producing):
             produce(in_reagent.name, needed, producing)
 
 
-needed = defaultdict(lambda: 0)
-producing = defaultdict(lambda: 0)
+needed = defaultdict(int)
+producing = defaultdict(int)
 needed[end] = 1
 produce(end, needed, producing)
 print(needed[start])
 
 search = 1000000000000
-i = 0
-jump = 1
+fuel_to_produce = 0
+fuel_jump = 1
 narrowing = False
 
 while True:
     needed = defaultdict(lambda: 0)
     producing = defaultdict(lambda: 0)
-    needed[end] = i
+    needed[end] = fuel_to_produce
     produce(end, needed, producing)
     if needed[start] > search:
         narrowing = True
-        jump = max(1, jump // 2)
-        i -= jump
+        fuel_jump = max(1, fuel_jump // 2)
+        fuel_to_produce -= fuel_jump
     elif not narrowing:
-        jump *= 2
-        i += jump
+        fuel_jump *= 2
+        fuel_to_produce += fuel_jump
     else:
-        if jump == 1:
+        if fuel_jump == 1:
             break
-        i += jump
+        fuel_to_produce += fuel_jump
 
-print(i)
+print(fuel_to_produce)
