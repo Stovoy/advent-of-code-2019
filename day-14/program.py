@@ -32,17 +32,17 @@ out_formulas = {}
 ore = 'ORE'
 fuel = 'FUEL'
 for line in lines:
-    l, r = line.split("=>")
-    o_num, o_name = r.strip().split(" ")
+    inputs, output = line.split("=>")
+    output_number, output_name = output.strip().split(" ")
 
     formula = Formula()
-    formula.output = ReagentInfo(o_name, int(o_num))
-    for in_chem in l.split(","):
-        in_chem = in_chem.strip()
-        i_num, i_name = in_chem.split(" ")
-        formula.inputs.append(ReagentInfo(i_name, int(i_num)))
-        in_formulas[i_name].append(formula)
-    out_formulas[o_name] = formula
+    formula.output = ReagentInfo(output_name, int(output_number))
+    for input_reagent in inputs.split(","):
+        input_reagent = input_reagent.strip()
+        input_number, input_name = input_reagent.split(" ")
+        formula.inputs.append(ReagentInfo(input_name, int(input_number)))
+        in_formulas[input_name].append(formula)
+    out_formulas[output_name] = formula
 
 needed = defaultdict(int)
 producing = defaultdict(int)
@@ -67,7 +67,7 @@ needed[fuel] = 1
 produce(fuel)
 print(needed[ore])
 
-search = 1000000000000
+ore_reserve = 1000000000000
 fuel_to_produce = 0
 fuel_jump = 1
 narrowing = False
@@ -77,7 +77,7 @@ while True:
     producing.clear()
     needed[fuel] = fuel_to_produce
     produce(fuel)
-    if needed[ore] > search:
+    if needed[ore] > ore_reserve:
         narrowing = True
         fuel_jump = max(1, fuel_jump // 2)
         fuel_to_produce -= fuel_jump
