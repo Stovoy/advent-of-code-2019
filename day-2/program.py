@@ -1,4 +1,4 @@
-from intcode import Runtime
+from advent import *
 
 with open('input.txt') as input_file:
     lines = input_file.readlines()
@@ -20,8 +20,7 @@ def find_noun_verb(program, desired_output):
                 return noun, verb
 
 
-line = lines[0]
-program = list(map(int, line.split(",")))
+program = parse_input_intcode(lines)
 print(run_noun_verb(program, 12, 2))
 noun, verb = find_noun_verb(program, 19690720)
 print(100 * noun + verb)

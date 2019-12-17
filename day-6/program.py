@@ -1,4 +1,4 @@
-from collections import defaultdict
+from advent import *
 
 with open('input.txt') as input_file:
     lines = input_file.readlines()

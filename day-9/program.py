@@ -1,12 +1,10 @@
-from intcode import Runtime
-
+from advent import *
 
 with open('input.txt') as input_file:
     lines = input_file.readlines()
 
 result = 0
-line = lines[0]
-program = list(map(int, line.split(",")))
+program = parse_input_intcode(lines)
 
 runtime = Runtime(program[:], [1])
 runtime.run()

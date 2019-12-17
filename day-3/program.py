@@ -1,12 +1,13 @@
+from advent import *
+
 with open('input.txt') as input_file:
     lines = input_file.readlines()
 
 
 def run_wire(board, line):
     intersections = []
-    x = 0
-    y = 0
-    center = (x, y)
+    position = 0, 0
+    center = position
     seen = set()
     steps = 0
     for coord in line.split(","):
@@ -14,17 +15,16 @@ def run_wire(board, line):
         number = int(coord[1:])
         for i in range(number):
             if direction == 'R':
-                x += 1
+                position = tuple_add(position, right_dx)
             elif direction == 'L':
-                x -= 1
+                position = tuple_add(position, left_dx)
             elif direction == 'U':
-                y += 1
+                position = tuple_add(position, up_dx)
             elif direction == 'D':
-                y -= 1
+                position = tuple_add(position, down_dx)
             steps += 1
-            position = x, y
             if position not in seen and position != center and position in board:
-                intersections.append((x, y, steps + board[position]))
+                intersections.append((position[0], position[1], steps + board[position]))
             board[position] = steps
             seen.add(position)
 

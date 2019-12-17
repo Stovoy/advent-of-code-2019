@@ -1,11 +1,9 @@
-from itertools import permutations
-from intcode import Runtime
+from advent import *
 
 with open('input.txt') as input_file:
     lines = input_file.readlines()
 
-line = lines[0]
-program = list(map(int, line.split(",")))
+program =  parse_input_intcode(lines)
 
 inputs = list(permutations(range(0, 5)))
 

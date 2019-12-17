@@ -1,4 +1,4 @@
-import math
+from advent import *
 
 with open('input.txt') as input_file:
     lines = input_file.readlines()
@@ -15,17 +15,14 @@ for line in lines:
 
 
 def check_asteroids(asteroids, position):
-    seen = {}
+    seen = defaultdict(list)
     for other_position in asteroids.keys():
         if position == other_position:
             continue
-        d_x, d_y = other_position[0] - position[0], other_position[1] - position[1]
+        d_x, d_y = tuple_subtract(other_position, position)
         angle = math.atan2(d_x, d_y)
         info = other_position, (d_x ** 2 + d_y ** 2)
-        if angle in seen:
-            seen[angle].append(info)
-        else:
-            seen[angle] = [info]
+        seen[angle].append(info)
     return seen
 
 
@@ -46,8 +43,7 @@ while True:
     angles = []
     for asteroids_at_angle in asteroid_info.values():
         asteroid = asteroids_at_angle[0][0]
-        d_x = asteroid[0] - position[0]
-        d_y = asteroid[1] - position[1]
+        d_x, d_y = tuple_subtract(asteroid, position)
         angles.append((math.atan2(d_x, d_y), asteroid))
 
     clockwise_asteroids = map(lambda v: v[1], sorted(angles)[::-1])

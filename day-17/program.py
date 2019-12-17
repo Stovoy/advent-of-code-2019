@@ -67,7 +67,7 @@ for intersection in intersections:
 print(alignment_sum)
 
 
-def add_tuple(a, b):
+def tuple_add(a, b):
     return a[0] + b[0], a[1] + b[1]
 
 
@@ -101,10 +101,10 @@ class RobotMovement:
         instructions = []
 
         while len(self.travelled) < len(scaffolds):
-            if add_tuple(self.position, self.direction) not in scaffolds:
+            if tuple_add(self.position, self.direction) not in scaffolds:
                 right_direction_index = (self.direction_index + 1) % 4
                 left_direction_index = (self.direction_index - 1) % 4
-                if add_tuple(self.position, directions[right_direction_index]) in scaffolds:
+                if tuple_add(self.position, directions[right_direction_index]) in scaffolds:
                     self.direction_index = right_direction_index
                     instructions += self.encode_moves() + ['R']
                 else:
@@ -126,7 +126,7 @@ class RobotMovement:
     def move_forward(self):
         self.moved += 1
         self.intersection_directions_travelled[self.position].add(self.direction_index)
-        self.position = add_tuple(self.position, self.direction)
+        self.position = tuple_add(self.position, self.direction)
         self.travelled.add(self.position)
 
 

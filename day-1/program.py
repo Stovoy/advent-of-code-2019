@@ -1,6 +1,7 @@
+from advent import *
+
 with open('input.txt') as input_file:
     lines = input_file.readlines()
-
 
 total_fuel = 0
 for line in lines:

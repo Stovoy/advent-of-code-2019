@@ -1,5 +1,4 @@
-import math
-from itertools import combinations
+from advent import *
 
 with open('../input.txt') as input_file:
     lines = input_file.readlines()
@@ -50,10 +49,5 @@ for dimension in range(3):
         seen.add(key)
         step_dimension(moons, dimension)
         t += 1
-
-
-def lcm(a, b):
-    return (a * b) // math.gcd(a, b)
-
 
 print(lcm(periods[0], lcm(periods[1], periods[2])))
