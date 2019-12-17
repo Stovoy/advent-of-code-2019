@@ -1,7 +1,4 @@
-from collections import defaultdict, Counter
-from intcode import Runtime
-from itertools import combinations
-import random
+from advent import *
 
 with open('input.txt') as input_file:
     lines = input_file.readlines()
@@ -30,60 +27,44 @@ runtime.run()
 board = parse_board(runtime.outputs)
 runtime.outputs = []
 
-left = min(board, key=lambda x: x[0])[0]
-right = max(board, key=lambda x: x[0])[0]
-top = min(board, key=lambda x: x[1])[1]
-bottom = max(board, key=lambda x: x[1])[1]
+bounds = board_bounds(board)
 
 robot_position = None
 intersections = set()
 scaffolds = set()
-for y in range(top, bottom + 1):
-    for x in range(left, right + 1):
-        if board[(x, y)] == '^':
-            robot_position = (x, y)
-        positions = [
-            (x, y),
-            (x + 1, y),
-            (x - 1, y),
-            (x, y + 1),
-            (x, y - 1),
-        ]
-        if board[(x, y)] == '#':
-            scaffolds.add((x, y))
-        int = True
-        for p in positions:
-            if p in board and board[p] != '#':
-                int = False
-                break
-        if int:
-            intersections.add((x, y))
+for x, y in iterate_board(board):
+    if board[(x, y)] == '^':
+        robot_position = (x, y)
+    positions = [
+        (x, y),
+        (x + 1, y),
+        (x - 1, y),
+        (x, y + 1),
+        (x, y - 1),
+    ]
+    if board[(x, y)] == '#':
+        scaffolds.add((x, y))
+    is_intersection = True
+    for position in positions:
+        if position in board and board[position] != '#':
+            is_intersection = False
+            break
+    if is_intersection:
+        intersections.add((x, y))
 
 alignment_sum = 0
 for intersection in intersections:
     x, y = intersection
-    alignment = (x - left) * (y - top)
+    alignment = (x - bounds.left) * (y - bounds.top)
     alignment_sum += alignment
 print(alignment_sum)
-
-
-def tuple_add(a, b):
-    return a[0] + b[0], a[1] + b[1]
-
-
-directions = [
-    (0, -1),
-    (1, 0),
-    (0, 1),
-    (-1, 0)
-]
 
 
 class RobotMovement:
     def __init__(self):
         self.position = 0
         self.direction = 0
-        self.direction_index = 0
+        self.direction_index = up_index
 
         self.moved = 0
         self.travelled = set()
@@ -187,22 +168,14 @@ input_program = f'{main_function}\n' \
                 'n\n'
 
 runtime = Runtime(program[:], list(map(ord, list(input_program))))
-done = False
 runtime.run()
 
 frame = []
 for i in range(len(runtime.outputs)):
     frame.append(runtime.outputs[i])
     if i > 0 and runtime.outputs[i - 1] == 10 and runtime.outputs[i] == 10:
-        board = parse_board(frame)
-        left = min(board, key=lambda x: x[0])[0]
-        right = max(board, key=lambda x: x[0])[0]
-        top = min(board, key=lambda x: x[1])[1]
-        bottom = max(board, key=lambda x: x[1])[1]
-
         print('============================================================')
-        for y in range(top, bottom + 1):
-            print(''.join(board[x, y] for x in range(left, right + 1)))
+        print_board(parse_board(frame))
         frame.clear()
 
 print(runtime.outputs[-1])

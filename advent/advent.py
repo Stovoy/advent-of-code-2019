@@ -31,6 +31,13 @@ def print_board(board):
         print(''.join(board[x, y] for x in range(bounds.left, bounds.right + 1)))
 
 
+def iterate_board(board):
+    bounds = board_bounds(board)
+    for y in range(bounds.top, bounds.bottom + 1):
+        for x in range(bounds.left, bounds.right + 1):
+            yield x, y
+
+
 directions = [
     (0, -1),
     (1, 0),
