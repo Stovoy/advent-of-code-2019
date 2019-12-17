@@ -18,20 +18,24 @@ dirs = {
     4: (1, 0)
 }
 
+
+def add_tuple(a, b):
+    return a[0] + b[0], a[1] + b[1]
+
+
 movement = []
 
 board = defaultdict(lambda: ' ')
 board[(0, 0)] = '!'
 moves = defaultdict(lambda: 1e10)
 moves[pos] = 0
-exit = (-18, -16)
 distance = moves[pos]
 i = 0
-found_exit = False
+exit = None
 while True:
     while True:
         dir = random.choice(list(dirs.keys()))
-        next_pos = tuple(map(sum, zip(pos, dirs[dir])))
+        next_pos = add_tuple(pos, dirs[dir])
         if board[next_pos] != '#':
             break
 
@@ -41,23 +45,22 @@ while True:
     output = runtime.outputs.pop()
 
     if output == 0:
-        wall_pos = tuple(map(sum, zip(pos, dirs[dir])))
+        wall_pos = add_tuple(pos, dirs[dir])
         board[wall_pos] = '#'
     elif output == 1:
-        pos = tuple(map(sum, zip(pos, dirs[dir])))
+        pos = add_tuple(pos, dirs[dir])
         moves[pos] = min(moves[pos], distance + 1)
         if board[pos] != "!":
             board[pos] = ' '
     elif output == 2:
-        pos = tuple(map(sum, zip(pos, dirs[dir])))
+        pos = add_tuple(pos, dirs[dir])
         moves[pos] = min(moves[pos], distance + 1)
         board[pos] = '*'
         exit = pos
-        found_exit = True
     i += 1
     if i % 5000 == 0:
         print(i)
-    if i > 200000 and found_exit:
+    if i > 200000 and exit is not None:
         break
 
 left = min(board, key=lambda x: x[0])[0]
@@ -67,8 +70,6 @@ bottom = max(board, key=lambda x: x[1])[1]
 
 for y in range(top, bottom + 1):
     print(''.join(board[x, y] for x in range(left, right + 1)))
-print(moves[exit])
-print(exit)
 
 
 def bfs(board, start):
@@ -77,10 +78,10 @@ def bfs(board, start):
     for item in queue:
         pos, depth = item
         next_nodes = [
-            tuple(map(sum, zip(pos, dirs[1]))),
-            tuple(map(sum, zip(pos, dirs[2]))),
-            tuple(map(sum, zip(pos, dirs[3]))),
-            tuple(map(sum, zip(pos, dirs[4]))),
+            add_tuple(pos, dirs[1]),
+            add_tuple(pos, dirs[2]),
+            add_tuple(pos, dirs[3]),
+            add_tuple(pos, dirs[4]),
         ]
         for new_node in next_nodes:
             if board[new_node] == '#' or new_node in filled:

@@ -112,7 +112,6 @@ Opcodes = {
     99: Exit(),
 }
 
-
 class Runtime:
     def __init__(self, program, inputs=None):
         self.program = program
