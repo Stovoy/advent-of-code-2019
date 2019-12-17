@@ -22,6 +22,7 @@ out_formulas = {}
 
 ore = 'ORE'
 fuel = 'FUEL'
+
 for line in lines:
     inputs, output = line.split("=>")
     output_number, output_name = output.strip().split(" ")
